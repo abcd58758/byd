@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	bool debug=false;
 	if(strcmp(argv[0],"byd") == 0)install=true;
 	if(argc >= 2)for(int i=1;i<argc;i++)if(strcmp(argv[i],"debug") == 0)debug=true;
-//--------------------------------
+//---------------------------------
 	if(debug)
 	{
 		printf("参数数量:%d\n",argc-1);
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 		printf("\n");
 		printf("path:%s\n",argv[0]);
 	}
-//---------------------------------
+//----------------------------------
 	if(argc <= 1 || strcmp(argv[1],"help") == 0 || strcmp(argv[1],"帮助") == 0)
 	{
 		printf("帮助：\n");
@@ -34,7 +34,9 @@ int main(int argc, char *argv[])
 		printf("upbyd 或 更新byd         更新软件包\n");
 		printf("remove 或 删除           删除软件包\n");
 		printf("	带参数 purge 或 删配置 以完全删除软件包\n");
-		printf("版本V1.3.4\n");
+		printf("autoremove 或 删除无用包           删除软件包\n");
+                printf("        带参数 purge 或 删配置 以完全删除软件包\n");
+		printf("版本V1.4.1\n");
 	}
 	else if(strcmp(argv[1],"installbyd") == 0 || strcmp(argv[1],"安装byd") == 0)
 	{
@@ -60,7 +62,18 @@ int main(int argc, char *argv[])
 	        }
 		char cmd[256]="sudo apt install ";
 		strcat(cmd,name);
-		system(cmd);
+		int status = system(cmd);
+		if(debug){printf("返回码：%d\n",WEXITSTATUS(status));printf("name:%s\n",name);}
+		if(WEXITSTATUS(status) == 100)
+		{
+		        printf("找不到这个软件包欸，要帮你搜一下吗？[y/n]\n");
+		        char in[256];
+		        scanf("%s",in);
+		        char find[256]="apt list | grep -i ";
+		        strcat(find,name);
+		        if(strcasecmp(in,"y") == 0)system(find);
+		        else printf("那你自己找吧，我溜了～\n");
+                }
 	}
 	else if(strcmp(argv[1],"bydfile") == 0 || strcmp(argv[1],"安装byd包") == 0)
 	{
@@ -100,7 +113,7 @@ int main(int argc, char *argv[])
 	        system("sudo chmod +x /usr/local/bin/byd");
 	        printf("已尝试更新，版本见help/帮助\n");
 	}
-	else if(strcmp(argv[1],"remove") == 0 || strcmp(argv[1],"卸载") == 0)
+	else if(strcmp(argv[1],"remove") == 0 || strcmp(argv[1],"删除") == 0)
 	{
 	        bool deldata=false;
 	        if(argc >= 2)for(int i=1;i<argc;i++)if(strcmp(argv[i],"purge") == 0 || strcmp(argv[i],"删配置") == 0)deldata=true;
@@ -128,6 +141,14 @@ int main(int argc, char *argv[])
 		        if(strcasecmp(in,"y") == 0)system(find);
 		        else printf("那你自己找吧，我溜了～\n");
                 }
+	}
+	else if(strcmp(argv[1],"autoremove") == 0 || strcmp(argv[1],"删除无用包") == 0)
+	{
+	        system("sudo apt upgrade");
+	        bool deldata=false;
+	        if(argc >= 2)for(int i=1;i<argc;i++)if(strcmp(argv[i],"purge") == 0 || strcmp(argv[i],"删配置") == 0)deldata=true;
+	        if(deldata)system("sudo apt autoremove --purge");
+	        else system("sudo apt autoremove");
 	}
 	else printf("未知命令，请输入help查看帮助\n");
 	return 0;
