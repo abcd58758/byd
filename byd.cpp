@@ -36,7 +36,8 @@ int main(int argc, char *argv[])
 		printf("	带参数 purge 或 删配置 以完全删除软件包\n");
 		printf("autoremove 或 删除无用包           删除软件包\n");
                 printf("        带参数 purge 或 删配置 以完全删除软件包\n");
-		printf("版本V1.4.1\n");
+                printf("upall 或 一键更新        一键刷新软件源、更新软件包、删除无用前置包\n");
+		printf("版本V1.5.0\n");
 	}
 	else if(strcmp(argv[1],"installbyd") == 0 || strcmp(argv[1],"安装byd") == 0)
 	{
@@ -149,6 +150,10 @@ int main(int argc, char *argv[])
 	        if(argc >= 2)for(int i=1;i<argc;i++)if(strcmp(argv[i],"purge") == 0 || strcmp(argv[i],"删配置") == 0)deldata=true;
 	        if(deldata)system("sudo apt autoremove --purge");
 	        else system("sudo apt autoremove");
+	}
+	else if(strcmp(argv[1],"upall") == 0 || strcmp(argv[1],"一键更新") == 0)
+	{
+	        system("sudo apt update && sudo apt upgrade -y && sudo apt autoremove --purge -y");
 	}
 	else printf("未知命令，请输入help查看帮助\n");
 	return 0;
